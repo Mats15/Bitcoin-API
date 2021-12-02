@@ -1,116 +1,123 @@
-// fetch('https://api.coingecko.com/api/v3/coins/list')
-// .then((response) => response.json())
-// .then(function (data) {
-// console.log(data)
-// })
-
-// fetch ('https://api.coingecko.com/api/v3/coins/list')
-// .then((response) => response.json())
-// .then(data => document.getElementById("TextDown").innerHTML = JSON.stringify(data));
-// function getData() { 
-//     let userDate = document.getElementById("HighDate").value = new Date().toJSON().slice(0,10).split('-').reverse().join('-');                 
-//     return fetch('https://api.coingecko.com/api/v3/coins/bitcoin/history?date='+userDate)
-//     .then(response => response.json())
-//     .then(data => document.getElementById("TextHigh").innerHTML = JSON.stringify(data))
-// }
-// document.addEventListener('DOMContentLoaded', function() {
-//     if (getData === "click") {
-//         getData()
-//     }
-// })
-let rawData = [];
+let priceRawData = [];
 function getData() { 
     let userDate = new Date(document.getElementById("HighDate").value);
-    console.log(userDate);
+    // console.log(userDate);
     let timeStamp = userDate.getTime()/1000;
     let userDate2 = new Date(document.getElementById("HighDate2").value); 
-    console.log(userDate2); 
+    // console.log(userDate2); 
     let timeStamp2 = userDate2.getTime()/1000+3600;
-    console.log(timeStamp); 
-    console.log(timeStamp2);  
+    // console.log(timeStamp); 
+    // console.log(timeStamp2);  
     return fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+timeStamp+'&to='+timeStamp2)   
     .then(response => response.json())   
     .then(data => {
-        rawData = data
-        console.log(data)
-        parseData(rawData)
-        //console.log(rawData);
+        priceRawData = data
+        // console.log(data)
+        parsePriceData(priceRawData)
+        // console.log(priceRawData);
         
     })  
 };
+let tradingRawData = [];
+function getTradingData() { 
+  let userTradingDate = new Date(document.getElementById("TradingDate").value);
+  console.log(userTradingDate);
+  let tradingTimeStamp = userTradingDate.getTime()/1000;
+  let userTradingDate2 = new Date(document.getElementById("TradingDate2").value); 
+  console.log(userTradingDate2); 
+  let tradingTimeStamp2 = userTradingDate2.getTime()/1000+3600;
+  console.log(tradingTimeStamp); 
+  console.log(tradingTimeStamp2);  
+  return fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=eur&from='+tradingTimeStamp+'&to='+tradingTimeStamp2)   
+  .then(response => response.json())   
+  .then(data => {
+      tradingRawData = data
+      console.log(data)
+      parseTradingData(tradingRawData)
+      console.log(tradingRawData);
+      
+  })  
+};
+//Parsing trading data 
+function parseTradingData(tradingRawData) {
+  let tradingDataArr = [];
+  tradingRawData.total_volumes.forEach(function (element) {
+    let con = element[0];
+    // console.log(con);
+    let con2 = new Date(con);
+    let time = con2.toLocaleTimeString('fi')+" Day: "+con2.getDate()+" Month: "+(con2.getMonth()+1)+" Year: "+con2.getFullYear();
+    let time2 = con2.getDate()+"/"+(con2.getMonth()+1)+"/"+con2.getFullYear();
+    let obj = {date: time, price: element[1], day: time2};
+    tradingDataArr.push(obj);  
     
+});  
+  console.log(tradingDataArr);
+  let filterTradingDataArr = tradingDataArr.filter(function(obj, index){
+    return obj.date.startsWith("2.");
+  })
+  console.log(filterTradingDataArr);
 
-function parseData(rawData){
+  let maxTradingDataArr = filterTradingDataArr.reduce((max, obj) => (max.price > obj.price) ? max : obj);
+  console.log(maxTradingDataArr);
+
+  // let day = date.getDate();
+  // console.log(day);
+
+  // let time = new Date(maxTradingDataArr.date);
+  // console.log(time);
+  document.getElementById("TextTrading").innerHTML = "In bitcoin’s historical data from CoinGecko, the highest trading day volume between input days was "+maxTradingDataArr.day+" and volume on that day in euros "+maxTradingDataArr.price+"€";
+}
+
+//Parsing longest bearish data
+function parsePriceData(priceRawData){
     let dataArr = [];
-    console.log(typeof rawData.prices[0]);
-    console.log(rawData.prices[0][0])
-    console.log(rawData.prices[24][0])
-    rawData.prices.forEach(function (element) {
+    let startDate = new Date(document.getElementById("HighDate").value);
+    let filteredStartDate = startDate.getDate()+"/"+(startDate.getMonth()+1)+"/"+startDate.getFullYear();
+    let endDate = new Date(document.getElementById("HighDate2").value);
+    let filteredEndDate = endDate.getDate()+"/"+(endDate.getMonth()+1)+"/"+endDate.getFullYear();
+    priceRawData.prices.forEach(function (element) {
         let con = element[0];
         let con2 = new Date(con);
         let time = con2.toLocaleTimeString('fi');
         let obj = {date: time, price: element[1]};
         dataArr.push(obj);  
     });    
-    // console.log(typeof dataArr[0].date);
-    // console.log(dataArr);
-
-
     const filterDataArr = dataArr.filter(function(obj, index){
         return obj.date.startsWith("2.");
       })
-
-    // const filterDataArr = dataArr.filter(function(date, index){
-    //     return index % 24 == 0;
-    //   })
-      
-      // Display new Array
-      console.log(filterDataArr);
+      // console.log(filterDataArr);
 
     function findDecreaseSubArray(filterDataArr) {
         let startIndex = 0;
         let length = 1;
-      
         let longestSequence = {
           startIndex: 0,
           length: 1
         }
-      
         filterDataArr.forEach((element, index, filterDataArr) => {
             if (index === 0) return;
           
-          if (element.price < filterDataArr[index -1].price) {
-            length += 1;
-          } else {      
-            length = 1;
-            startIndex = index;
-          }
-      
-          if (length > longestSequence.length) {
-              longestSequence.length = length;
-              longestSequence.startIndex = startIndex;
-              
-              console.log(dataArr);
-          }
-            document.getElementById("TextHigh").innerHTML = "In bitcoin’s historical data from CoinGecko, the price decreased "+longestSequence.length+" days's in a row for the inputs from";
+            if (element.price < filterDataArr[index -1].price) {
+              length += 1;
+            } else {      
+              length = 1;
+              startIndex = index;
+            }
+            if (length > longestSequence.length) {
+                longestSequence.length = length;
+                longestSequence.startIndex = startIndex;
+            }
+              document.getElementById("TextHigh").innerHTML = "In bitcoin’s historical data from CoinGecko, the price decreased "+longestSequence.length+" days's in a row for the inputs from "+filteredStartDate+" and to "+filteredEndDate;
         })
-      
-        return longestSequence;
-        
+        return longestSequence;  
       }
-      console.log(findDecreaseSubArray(filterDataArr));
-      //document.getElementById("TextHigh").innerHTML = JSON.stringify(findDecreaseSubArray("In bitcoin’s historical data from CoinGecko, the price decreased"+longestSequencelength));
-
-    
-    
-     
-    
+      console.log(findDecreaseSubArray(filterDataArr));  
 }
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
-    if (getData === "click") {
+    if (getData  === "click") {
         getData()        
+    } else if (getTradingData === "click") {
+      getTradingData()
     }
 })
