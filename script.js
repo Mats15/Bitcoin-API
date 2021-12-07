@@ -19,9 +19,9 @@ function parsePriceData(priceRawData){
     let endDate = new Date(document.getElementById("HighDate2").value);
     let filteredEndDate = endDate.getDate()+"/"+(endDate.getMonth()+1)+"/"+endDate.getFullYear();
     priceRawData.prices.forEach(function (element) {
-        let con = element[0];
-        let con2 = new Date(con);
-        let time = con2.toLocaleTimeString('fi');
+        let rawUnix = element[0];
+        let conDate = new Date(rawUnix);
+        let time = conDate.toLocaleTimeString('fi');
         let obj = {date: time, price: element[1]};
         dataArr.push(obj);  
     });    
@@ -50,9 +50,6 @@ function parsePriceData(priceRawData){
             }  
         }) 
         let today = new Date();
-        console.log(today);
-        console.log(startDate);
-        console.log(filteredStartDate);
          if (startDate > endDate) {
             document.getElementById("TextHigh").innerHTML = "Start date cannot be after end date";
           } else if (filteredStartDate == filteredEndDate) {
@@ -91,10 +88,10 @@ function parseTradingData(tradingRawData) {
   let TradingEndDate = new Date(document.getElementById("TradingDate2").value);
   let filteredTradingEndDate = TradingEndDate.getDate()+"/"+(TradingEndDate.getMonth()+1)+"/"+TradingEndDate.getFullYear();
   tradingRawData.total_volumes.forEach(function (element) {
-    let con = element[0];
-    let con2 = new Date(con);
-    let time = con2.toLocaleTimeString('fi')+" Day: "+con2.getDate()+" Month: "+(con2.getMonth()+1)+" Year: "+con2.getFullYear();
-    let time2 = con2.getDate()+"/"+(con2.getMonth()+1)+"/"+con2.getFullYear();
+    let rawUnix = element[0];
+    let conDate = new Date(rawUnix);
+    let time = conDate.toLocaleTimeString('fi')+" Day: "+conDate.getDate()+" Month: "+(conDate.getMonth()+1)+" Year: "+conDate.getFullYear();
+    let time2 = conDate.getDate()+"/"+(conDate.getMonth()+1)+"/"+conDate.getFullYear();
     let obj = {date: time, price: element[1], day: time2};
     tradingDataArr.push(obj);      
 });  
@@ -102,8 +99,6 @@ function parseTradingData(tradingRawData) {
     return obj.date.startsWith("2.");
   })
   let today2 = new Date();
-  console.log(TradingStartDate);
-  console.log(TradingEndDate);
   if (TradingStartDate > TradingEndDate) {
       document.getElementById("TextTrading").innerHTML = "Start date cannot be after end date";
     } else if (filteredTradingStartDate == filteredTradingEndDate) {
@@ -134,31 +129,29 @@ function parseTimeMachineData(timeMachineRawData) {
   let timeMachineDataArr = [];
   let TimeMachineDate = new Date(document.getElementById("TimeMachineDate").value);
   let TimeMachineDate2 = new Date(document.getElementById("TimeMachineDate2").value); 
+  let filteredTimeMachineDate = TimeMachineDate.getDate()+"/"+(TimeMachineDate.getMonth()+1)+"/"+TimeMachineDate.getFullYear();
+  let filteredTimeMachineDate2 = TimeMachineDate2.getDate()+"/"+(TimeMachineDate2.getMonth()+1)+"/"+TimeMachineDate2.getFullYear();
   timeMachineRawData.prices.forEach(function (element) {
-    let con = element[0];
-    let con2 = new Date(con);
-    let time = con2.toLocaleTimeString('fi')+" Day: "+con2.getDate()+" Month: "+(con2.getMonth()+1)+" Year: "+con2.getFullYear();
-    let time2 = con2.getDate()+"/"+(con2.getMonth()+1)+"/"+con2.getFullYear();
-    let obj = {date: time, price: element[1], day: time2, unixTime: con};
+    let rawUnix = element[0];
+    let conDate = new Date(rawUnix);
+    let time = conDate.toLocaleTimeString('fi')+" Day: "+conDate.getDate()+" Month: "+(conDate.getMonth()+1)+" Year: "+conDate.getFullYear();
+    let time2 = conDate.getDate()+"/"+(conDate.getMonth()+1)+"/"+conDate.getFullYear();
+    let obj = {date: time, price: element[1], day: time2, unixTime: rawUnix};
     timeMachineDataArr.push(obj);    
-  });  
-  console.log(timeMachineDataArr);
+  }); 
   let filterTimeMachineDataArr = timeMachineDataArr.filter(function(obj, index){
     return obj.date.startsWith(("2.")||("3."));
   })
-  console.log(filterTimeMachineDataArr);
   let today3 = new Date();
   if (TimeMachineDate > TimeMachineDate2) {
       document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be after end date";
-    } else if (TimeMachineDate == TimeMachineDate2) {
-      document.getElementById("TextTimeMachine").innerHTML = "You cannot choose day from future"; 
+    } else if (filteredTimeMachineDate == filteredTimeMachineDate2) {
+      document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be same as end date"; 
     } else if (TimeMachineDate > today3 || TimeMachineDate2 > today3) {
       document.getElementById("TextTimeMachine").innerHTML = "You cannot choose day from future"; 
     } else {
         let minTradingDataArr = filterTimeMachineDataArr.reduce((min, obj) => (min.price < obj.price) ? min : obj);
-        console.log(minTradingDataArr);
         let maxTradingDataArr = filterTimeMachineDataArr.reduce((max, obj) => (max.price > obj.price && minTradingDataArr.unixTime < obj.unixTime) ? max : obj);
-        console.log(maxTradingDataArr);
         if (minTradingDataArr === maxTradingDataArr) {
             document.getElementById("TextTimeMachine").innerHTML = "Dont buy or sell between this input days!"; 
         } else {
