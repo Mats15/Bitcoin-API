@@ -14,34 +14,37 @@
         </div>
         <div class="midleContainer">
             <div class="highContainer">
-                <div class="dateContainer">
+                <p>Longest bearish downward trend within a given date range</p>
+                <div class="inputContainer">
                     <input type="date" id="HighDate">
                     <input type="date" id="HighDate2">
+                    <button onclick="getData()" id="ButtonHigh">Search</button> <br><br>
                 </div>
-                <button onclick="getData()" id="ButtonHigh">Search</button> <br><br>
                 <span id="TextHigh" role="textbox"></span><br><br>
             </div>
             <br><br>
             <div class="tradingContainer">
-                <div class="dateContainer">
+                <p>Given date range had the highest trading volume</p>
+                <div class="inputContainer">
                     <input type="date" id="TradingDate">
                     <input type="date" id="TradingDate2">
+                    <button onclick="getTradingData()" id="ButtonTrading">Search</button> <br><br>
                 </div>
-                <button onclick="getTradingData()" id="ButtonTrading">Search</button> <br><br>
                 <span id="TextTrading" role="textbox"></span><br><br>
             </div>  
             <br><br>
             <div class="timeMachineContainer">
-                <div class="dateContainer">
+                <p>Gyro Gearloose’s newest invention, a time machine</p>
+                <div class="inputContainer">
                     <input type="date" id="TimeMachineDate">
                     <input type="date" id="TimeMachineDate2">
+                    <button onclick="getTimeMachineData()" id="ButtonTimeMachine">Search</button> <br><br>
                 </div>
-                <button onclick="getTimeMachineData()" id="ButtonTimeMachine">Search</button> <br><br>
                 <span id="TextTimeMachine" role="textbox"></span><br><br>  
             </div>
         </div>
         <div class="footerContainer">
-            <h1>This is footer</h1>
+            <h1>Done by Matias to Scrooge McDuck</h1>
         </div>
     </body>
         <script src="script.js"></script>
