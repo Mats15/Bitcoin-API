@@ -27,7 +27,7 @@ function parsePriceData(priceRawData){
     });    
     const filterDataArr = dataArr.filter(function(obj, index){
         return obj.date.startsWith("2.");
-      })
+    })
     function findDecreaseSubArray(filterDataArr) {
         let startIndex = 0;
         let length = 1;
@@ -51,22 +51,21 @@ function parsePriceData(priceRawData){
         }) 
         let today = new Date();
          if (startDate > endDate) {
-            document.getElementById("TextHigh").innerHTML = "Start date cannot be after end date";
+            document.getElementById("TextHigh").innerHTML = "Start date cannot be after the end date";
           } else if (filteredStartDate == filteredEndDate) {
-            document.getElementById("TextHigh").innerHTML = "Start date cannot be same as end date";
+            document.getElementById("TextHigh").innerHTML = "Start date cannot be the same as the end date";
           } else if (startDate > today || endDate > today) {
-            document.getElementById("TextHigh").innerHTML = "You cannot choose day from future";
+            document.getElementById("TextHigh").innerHTML = "You cannot choose a day from the future";
           } else {
             document.getElementById("TextHigh").innerHTML = "In bitcoin’s historical data from CoinGecko, the price decreased "+longestSequence.length+" days in a row for the inputs from "+filteredStartDate+" to "+filteredEndDate;
           }
           
-         
-         
         return longestSequence;  
       }
       console.log(findDecreaseSubArray(filterDataArr));  
 }
 
+//Fetch trading data from CoinGecko API
 let tradingRawData = [];
 function getTradingData() { 
   let userTradingDate = new Date(document.getElementById("TradingDate").value);
@@ -80,6 +79,7 @@ function getTradingData() {
       parseTradingData(tradingRawData)      
   })  
 };
+
 //Parsing trading data 
 function parseTradingData(tradingRawData) {
   let tradingDataArr = [];
@@ -94,23 +94,26 @@ function parseTradingData(tradingRawData) {
     let time2 = conDate.getDate()+"/"+(conDate.getMonth()+1)+"/"+conDate.getFullYear();
     let obj = {date: time, price: element[1], day: time2};
     tradingDataArr.push(obj);      
-});  
+  });  
+
   let filterTradingDataArr = tradingDataArr.filter(function(obj, index){
     return obj.date.startsWith("2.");
   })
+
   let today2 = new Date();
   if (TradingStartDate > TradingEndDate) {
-      document.getElementById("TextTrading").innerHTML = "Start date cannot be after end date";
+      document.getElementById("TextTrading").innerHTML = "Start date cannot be after the end date";
     } else if (filteredTradingStartDate == filteredTradingEndDate) {
-      document.getElementById("TextTrading").innerHTML = "Start date cannot be same as end date";
+      document.getElementById("TextTrading").innerHTML = "Start date cannot be the same as the end date";
     } else if (TradingStartDate > today2 || TradingEndDate > today2) {
-      document.getElementById("TextTrading").innerHTML = "You cannot choose day from future";
+      document.getElementById("TextTrading").innerHTML = "You cannot choose a day from future";
     } else {
       let maxTradingDataArr = filterTradingDataArr.reduce((max, obj) => (max.price > obj.price) ? max : obj);
       document.getElementById("TextTrading").innerHTML = "In bitcoin’s historical data from CoinGecko, the highest trading day volume between input days was "+maxTradingDataArr.day+" and volume on that day in euros "+maxTradingDataArr.price+"€";
     }
 }
 
+//Fetch time machine data from CoinGecko API
 let timeMachineRawData = [];
 function getTimeMachineData() { 
   let userTimeMachineDate = new Date(document.getElementById("TimeMachineDate").value);
@@ -124,6 +127,7 @@ function getTimeMachineData() {
       parseTimeMachineData(timeMachineRawData)    
   })  
 };
+
 //Parsing Time Machine data
 function parseTimeMachineData(timeMachineRawData) {
   let timeMachineDataArr = [];
@@ -131,6 +135,7 @@ function parseTimeMachineData(timeMachineRawData) {
   let TimeMachineDate2 = new Date(document.getElementById("TimeMachineDate2").value); 
   let filteredTimeMachineDate = TimeMachineDate.getDate()+"/"+(TimeMachineDate.getMonth()+1)+"/"+TimeMachineDate.getFullYear();
   let filteredTimeMachineDate2 = TimeMachineDate2.getDate()+"/"+(TimeMachineDate2.getMonth()+1)+"/"+TimeMachineDate2.getFullYear();
+
   timeMachineRawData.prices.forEach(function (element) {
     let rawUnix = element[0];
     let conDate = new Date(rawUnix);
@@ -139,21 +144,23 @@ function parseTimeMachineData(timeMachineRawData) {
     let obj = {date: time, price: element[1], day: time2, unixTime: rawUnix};
     timeMachineDataArr.push(obj);    
   }); 
+
   let filterTimeMachineDataArr = timeMachineDataArr.filter(function(obj, index){
     return obj.date.startsWith(("2.")||("3."));
   })
+
   let today3 = new Date();
   if (TimeMachineDate > TimeMachineDate2) {
-      document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be after end date";
+      document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be after the end date";
     } else if (filteredTimeMachineDate == filteredTimeMachineDate2) {
-      document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be same as end date"; 
+      document.getElementById("TextTimeMachine").innerHTML = "Start date cannot be the same as the end date"; 
     } else if (TimeMachineDate > today3 || TimeMachineDate2 > today3) {
-      document.getElementById("TextTimeMachine").innerHTML = "You cannot choose day from future"; 
+      document.getElementById("TextTimeMachine").innerHTML = "You cannot choose a day from future"; 
     } else {
         let minTradingDataArr = filterTimeMachineDataArr.reduce((min, obj) => (min.price < obj.price) ? min : obj);
         let maxTradingDataArr = filterTimeMachineDataArr.reduce((max, obj) => (max.price > obj.price && minTradingDataArr.unixTime < obj.unixTime) ? max : obj);
         if (minTradingDataArr === maxTradingDataArr) {
-            document.getElementById("TextTimeMachine").innerHTML = "Dont buy or sell between this input days!"; 
+            document.getElementById("TextTimeMachine").innerHTML = "Dont buy or sell between the selected days!"; 
         } else {
           document.getElementById("TextTimeMachine").innerHTML = "Best day to buy Bitcoin between the input days was "+minTradingDataArr.day+" And best day to sell was "+maxTradingDataArr.day;
         } 
